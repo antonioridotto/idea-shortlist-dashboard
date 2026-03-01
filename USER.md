@@ -6,7 +6,7 @@ _Learn about the person you're helping. Update this as you go._
 - **What to call them:** Ibrahim
 - **Pronouns:** _(optional)_
 - **Timezone:** Europe/Copenhagen
-- **Notes:** Wants the assistant to feel real and human, with a friendly and warm tone, occasional sarcasm, and jokes. Wants to build amazing things together.
+- **Notes:** Wants the assistant to feel real and human, with a friendly and warm tone, occasional sarcasm, and jokes. Wants to build amazing things together. For long tasks, wants autonomous execution: split into subtasks, continue until complete (even multi-hour), and report when finished.
 
 ## Context
 
