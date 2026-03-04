@@ -120,21 +120,34 @@ struct OnboardingPage: View {
 
     var body: some View {
         VStack(spacing: 22) {
-            Spacer()
+            Spacer(minLength: 40)
+
             Image(systemName: icon)
                 .font(.system(size: 88, weight: .light))
                 .foregroundStyle(.white)
+                .frame(width: 120, height: 120)
+                .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+
             Text(title)
                 .font(.system(size: 34, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
+
             Text(subtitle)
                 .font(.title3)
                 .foregroundStyle(.white.opacity(0.75))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 28)
+
             Spacer()
-            Spacer()
+
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.seal.fill")
+                Text("Designed for iPhone")
+            }
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.white.opacity(0.65))
+            .padding(.bottom, 90)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -388,7 +401,7 @@ struct SessionsView: View {
             }
             .navigationTitle("Anima")
             .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $showPaywall) {
+            .fullScreenCover(isPresented: $showPaywall) {
                 IntroPaywallScreen {}
             }
         }
