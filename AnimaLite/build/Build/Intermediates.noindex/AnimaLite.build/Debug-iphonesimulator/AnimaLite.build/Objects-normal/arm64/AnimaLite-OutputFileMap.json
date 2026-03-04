@@ -1,0 +1,29 @@
+{
+  "" : {
+    "diagnostics" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLite-primary.dia",
+    "emit-module-dependencies" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLite-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLite-primary-emit-module.dia",
+    "pch" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLite-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLite-primary.swiftdeps"
+  },
+  "/Users/antonioridotto/.openclaw/workspace/AnimaLite/Sources/AnimaLiteApp.swift" : {
+    "const-values" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLiteApp.swiftconstvalues",
+    "dependencies" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLiteApp.d",
+    "diagnostics" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLiteApp.dia",
+    "index-unit-output-path" : "/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLiteApp.o",
+    "llvm-bc" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLiteApp.bc",
+    "object" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLiteApp.o",
+    "swift-dependencies" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLiteApp.swiftdeps",
+    "swiftmodule" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/AnimaLiteApp~partial.swiftmodule"
+  },
+  "/Users/antonioridotto/.openclaw/workspace/AnimaLite/Sources/ContentView.swift" : {
+    "const-values" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/antonioridotto/.openclaw/workspace/AnimaLite/build/Build/Intermediates.noindex/AnimaLite.build/Debug-iphonesimulator/AnimaLite.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  }
+}

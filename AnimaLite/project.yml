@@ -1,0 +1,21 @@
+name: AnimaLite
+options:
+  minimumXcodeGenVersion: 2.38.0
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: com.ibrahim.animalite
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+targets:
+  AnimaLite:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        INFOPLIST_FILE: Sources/Info.plist
+        PRODUCT_NAME: AnimaLite
+        SWIFT_VERSION: 5.0
+        TARGETED_DEVICE_FAMILY: 1
+    scheme:
+      testTargets: []
