@@ -3,51 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Realtime Voice UI</title>
+    <title>Antonio Voice Bridge</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <main class="container">
-      <h1>🎙️ Realtime Voice UI</h1>
-      <p class="subtitle">Continuous OpenAI Realtime conversation</p>
-
-      <section class="card controls">
-        <div class="row two-col">
-          <label>
-            Model
-            <input id="model" value="gpt-4o-realtime-preview-2024-12-17" />
-          </label>
-          <label>
-            Voice
-            <input id="voice" value="alloy" />
-          </label>
-        </div>
-
-        <label>
-          Instructions
-          <textarea id="instructions" rows="3">You are a natural, concise, and friendly assistant. Keep responses conversational for spoken dialogue.</textarea>
-        </label>
-
-        <div class="row">
-          <label class="inline">
-            <input type="checkbox" id="vad" checked />
-            Auto VAD mode
-          </label>
-          <button id="connectBtn">Connect</button>
-          <button id="disconnectBtn" disabled>Disconnect</button>
-          <button id="pttBtn" disabled>Hold to Talk</button>
-        </div>
-      </section>
+      <h1>🗣️ Antonio Voice Bridge</h1>
+      <p class="subtitle">Speak to this exact OpenClaw session (no extra model/API key)</p>
 
       <section class="card">
-        <h2>Status</h2>
+        <div class="row">
+          <button id="listenBtn">Start Listening</button>
+          <button id="stopBtn" disabled>Stop</button>
+          <label class="inline">
+            <input id="autoSpeak" type="checkbox" checked />
+            Read replies aloud
+          </label>
+        </div>
+
+        <div class="row">
+          <input id="manualInput" placeholder="Type instead of speaking..." />
+          <button id="sendBtn">Send</button>
+        </div>
+
         <div id="status">Idle</div>
-        <pre id="logs"></pre>
       </section>
 
       <section class="card">
         <h2>Transcript</h2>
         <div id="transcript"></div>
+      </section>
+
+      <section class="card">
+        <h2>Logs</h2>
+        <pre id="logs"></pre>
       </section>
     </main>
 
