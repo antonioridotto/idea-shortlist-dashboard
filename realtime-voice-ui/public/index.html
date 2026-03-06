@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Realtime Voice UI</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>🎙️ Realtime Voice UI</h1>
+      <p class="subtitle">Continuous OpenAI Realtime conversation</p>
+
+      <section class="card controls">
+        <div class="row two-col">
+          <label>
+            Model
+            <input id="model" value="gpt-4o-realtime-preview-2024-12-17" />
+          </label>
+          <label>
+            Voice
+            <input id="voice" value="alloy" />
+          </label>
+        </div>
+
+        <label>
+          Instructions
+          <textarea id="instructions" rows="3">You are a natural, concise, and friendly assistant. Keep responses conversational for spoken dialogue.</textarea>
+        </label>
+
+        <div class="row">
+          <label class="inline">
+            <input type="checkbox" id="vad" checked />
+            Auto VAD mode
+          </label>
+          <button id="connectBtn">Connect</button>
+          <button id="disconnectBtn" disabled>Disconnect</button>
+          <button id="pttBtn" disabled>Hold to Talk</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Status</h2>
+        <div id="status">Idle</div>
+        <pre id="logs"></pre>
+      </section>
+
+      <section class="card">
+        <h2>Transcript</h2>
+        <div id="transcript"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
