@@ -7,18 +7,27 @@
 3. Remove games first.
 4. Apply exclusions from `reports/idea-exclude-list.txt`.
 5. Apply dedupe from `reports/daily-idea-history.jsonl`.
-6. Build/share CLEAN non-game pool (target 30).
-7. Pick top 3 ONLY from that same clean pool.
-8. Include App Store links + GAP + saturation + opportunity + low-cost rationale.
-9. Third-party API gate (mandatory): if core feature needs an external API, verify a usable public/free API exists first; if only paid/expensive APIs can enable the core value, exclude that app from the 30-list.
+6. Build/share CLEAN non-game pool (target 30) and include links.
+7. Use staged narrowing ONLY from that same clean pool: 30 -> 10 -> 5 -> 3 -> 1.
+8. At EACH narrowing step, compare candidates and explicitly explain why selected/eliminated.
+9. Include App Store links + GAP + saturation + opportunity + low-cost rationale for shortlisted/final picks.
+10. Third-party API gate (mandatory): if core feature needs an external API, verify a usable public/free API exists first; if only paid/expensive APIs can enable the core value, exclude that app from the 30-list.
+11. Content-heavy gate (mandatory): exclude apps that require ongoing custom content production (e.g., filming training videos/editorial-heavy pipelines) to deliver core value.
 
 ## Never do
 - Never send raw first-30 as final pool.
 - Never pick top-3 outside the clean pool.
-- Never output insufficient before completing 30->60->90 expansion and required page depth.
+- Never output "0 ideas" or "insufficient" to Ibrahim.
+- If pool collapses, treat it as pipeline failure and re-run: increase page depth, execute 30->60->90 window expansion, then US->WW fallback, and still return a valid clean list + staged narrowing.
 
 
 ## Ranking policy update (from Ibrahim feedback)
 - Do not reject a candidate only because market is crowded if momentum/velocity is clearly strong.
 - Ranking priority: Momentum > Build speed > Monetization clarity > Saturation risk.
 - Final 3 must explain momentum explicitly.
+
+## Morning delivery format (mandatory)
+- Send FULL clean 30 list every morning.
+- Send staged picks: 30 -> 10 -> 5 -> 3 -> 1.
+- Include comparison rationale at each stage.
+- Include final winner and concise why-this-winner summary.
