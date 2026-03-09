@@ -1,442 +1,219 @@
 import SwiftUI
 
-struct SessionPreset: Identifiable {
-    let id = UUID()
-    let title: String
-    let subtitle: String
-    let minutes: Int
-    let icon: String
+struct InjectionEntry: Identifiable, Codable, Equatable {
+    let id: UUID
+    var date: Date
+    var doseMg: Double
+    var note: String
+
+    init(id: UUID = UUID(), date: Date, doseMg: Double, note: String = "") {
+        self.id = id
+        self.date = date
+        self.doseMg = doseMg
+        self.note = note
+    }
+}
+
+@MainActor
+final class GLP1TrackerViewModel: ObservableObject {
+    @Published private(set) var entries: [InjectionEntry] = []
+    @AppStorage("glp1.defaultDose") var defaultDose: Double = 0.25
+    @AppStorage("glp1.reminderEnabled") var reminderEnabled: Bool = false
+    @AppStorage("glp1.reminderHour") var reminderHour: Int = 20
+
+    @Published var selectedDose: Double = 0.25
+    @Published var selectedDate: Date = Date()
+    @Published var note: String = ""
+
+    private let storageKey = "glp1.entries.v1"
+
+    init() {
+        selectedDose = defaultDose
+        load()
+    }
+
+    var lastInjection: InjectionEntry? { entries.sorted(by: { $0.date > $1.date }).first }
+
+    var nextInjectionDate: Date? {
+        guard let last = lastInjection else { return nil }
+        return Calendar.current.date(byAdding: .day, value: 7, to: last.date)
+    }
+
+    var daysUntilNextShot: Int? {
+        guard let next = nextInjectionDate else { return nil }
+        let start = Calendar.current.startOfDay(for: Date())
+        let end = Calendar.current.startOfDay(for: next)
+        return Calendar.current.dateComponents([.day], from: start, to: end).day
+    }
+
+    var completedThisMonth: Int {
+        let now = Date()
+        return entries.filter { Calendar.current.isDate($0.date, equalTo: now, toGranularity: .month) }.count
+    }
+
+    var adherenceStreakWeeks: Int {
+        let sorted = entries.sorted { $0.date > $1.date }
+        guard sorted.count > 1 else { return sorted.isEmpty ? 0 : 1 }
+        var streak = 1
+        for index in 0..<(sorted.count - 1) {
+            let newer = sorted[index].date
+            let older = sorted[index + 1].date
+            let days = Calendar.current.dateComponents([.day], from: older, to: newer).day ?? 0
+            if (6...8).contains(days) { streak += 1 } else { break }
+        }
+        return streak
+    }
+
+    func addInjection() {
+        let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        let entry = InjectionEntry(date: selectedDate, doseMg: selectedDose, note: trimmed)
+        entries.append(entry)
+        entries.sort { $0.date > $1.date }
+        note = ""
+        selectedDate = Date()
+        defaultDose = selectedDose
+        save()
+    }
+
+    func deleteEntries(at offsets: IndexSet) {
+        entries.remove(atOffsets: offsets)
+        save()
+    }
+
+    private func save() {
+        guard let data = try? JSONEncoder().encode(entries) else { return }
+        UserDefaults.standard.set(data, forKey: storageKey)
+    }
+
+    private func load() {
+        guard let data = UserDefaults.standard.data(forKey: storageKey),
+              let decoded = try? JSONDecoder().decode([InjectionEntry].self, from: data) else { return }
+        entries = decoded.sorted(by: { $0.date > $1.date })
+    }
 }
 
 struct ContentView: View {
-    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
+    @StateObject private var vm = GLP1TrackerViewModel()
+    private let doses: [Double] = [0.25, 0.5, 1.0, 1.7, 2.4]
 
-    private var debugScreen: String? {
-        let args = ProcessInfo.processInfo.arguments
-        guard let idx = args.firstIndex(of: "--debug-screen"), idx + 1 < args.count else { return nil }
-        return args[idx + 1]
-    }
-
-    var body: some View {
-        Group {
-            if let debugScreen {
-                switch debugScreen {
-                case "onboarding1":
-                    OnboardingPage(title: "Focus in Minutes", subtitle: "Binaural sessions designed for deep work.", icon: "brain.head.profile")
-                        .background(LinearGradient(colors: [Color.black, Color(red: 0.05, green: 0.08, blue: 0.16)], startPoint: .topLeading, endPoint: .bottomTrailing).ignoresSafeArea())
-                case "onboarding2":
-                    OnboardingPage(title: "Sleep Better", subtitle: "Calming waves to wind down naturally.", icon: "moon.zzz.fill")
-                        .background(LinearGradient(colors: [Color.black, Color(red: 0.05, green: 0.08, blue: 0.16)], startPoint: .topLeading, endPoint: .bottomTrailing).ignoresSafeArea())
-                case "onboarding3":
-                    OnboardingPage(title: "Track Progress", subtitle: "Build your streak and stay consistent.", icon: "chart.line.uptrend.xyaxis")
-                        .background(LinearGradient(colors: [Color.black, Color(red: 0.05, green: 0.08, blue: 0.16)], startPoint: .topLeading, endPoint: .bottomTrailing).ignoresSafeArea())
-                case "rate":
-                    RateUsScreen(onContinue: {})
-                case "paywall":
-                    IntroPaywallScreen(onClose: {})
-                case "settings":
-                    SettingsScreen()
-                default:
-                    MainTabView()
-                }
-            } else if hasSeenOnboarding {
-                MainTabView()
-            } else {
-                LaunchFlow {
-                    hasSeenOnboarding = true
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Launch Flow (Onboarding -> Rate Us -> Paywall)
-
-enum LaunchStep {
-    case onboarding
-    case rateUs
-    case paywall
-}
-
-struct LaunchFlow: View {
-    @State private var step: LaunchStep = .onboarding
-    @State private var page = 0
-    let onFinish: () -> Void
-
-    var body: some View {
-        Group {
-            switch step {
-            case .onboarding:
-                onboarding
-            case .rateUs:
-                RateUsScreen {
-                    withAnimation(.easeInOut) { step = .paywall }
-                }
-            case .paywall:
-                IntroPaywallScreen {
-                    onFinish()
-                }
-            }
-        }
-    }
-
-    private var onboarding: some View {
-        ZStack {
-            LinearGradient(colors: [Color.black, Color(red: 0.05, green: 0.08, blue: 0.16)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-
-            TabView(selection: $page) {
-                OnboardingPage(title: "Focus in Minutes", subtitle: "Binaural sessions designed for deep work.", icon: "brain.head.profile").tag(0)
-                OnboardingPage(title: "Sleep Better", subtitle: "Calming waves to wind down naturally.", icon: "moon.zzz.fill").tag(1)
-                OnboardingPage(title: "Track Progress", subtitle: "Build your streak and stay consistent.", icon: "chart.line.uptrend.xyaxis").tag(2)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .always))
-
-            VStack {
-                Spacer()
-                Button(page == 2 ? "Continue" : "Next") {
-                    if page < 2 {
-                        withAnimation(.easeInOut) { page += 1 }
-                    } else {
-                        withAnimation(.easeInOut) { step = .rateUs }
-                    }
-                }
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 15)
-                .background(.white, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .foregroundStyle(.black)
-                .padding(.horizontal, 18)
-                .padding(.bottom, 24)
-            }
-        }
-    }
-}
-
-struct OnboardingPage: View {
-    let title: String
-    let subtitle: String
-    let icon: String
-
-    var body: some View {
-        VStack(spacing: 22) {
-            Spacer(minLength: 40)
-
-            Image(systemName: icon)
-                .font(.system(size: 88, weight: .light))
-                .foregroundStyle(.white)
-                .frame(width: 120, height: 120)
-                .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-
-            Text(title)
-                .font(.system(size: 34, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-
-            Text(subtitle)
-                .font(.title3)
-                .foregroundStyle(.white.opacity(0.75))
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 28)
-
-            Spacer()
-
-            HStack(spacing: 6) {
-                Image(systemName: "checkmark.seal.fill")
-                Text("Designed for iPhone")
-            }
-            .font(.footnote.weight(.semibold))
-            .foregroundStyle(.white.opacity(0.65))
-            .padding(.bottom, 90)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-struct RateUsScreen: View {
-    let onContinue: () -> Void
-
-    var body: some View {
-        ZStack {
-            LinearGradient(colors: [Color.black, Color.indigo.opacity(0.9)], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-
-            VStack(spacing: 18) {
-                Spacer()
-                Image(systemName: "star.bubble.fill")
-                    .font(.system(size: 72))
-                    .foregroundStyle(.yellow)
-
-                Text("Help us improve")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-
-                Text("If you enjoy Anima, please rate us. It helps us build better sessions for everyone.")
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.white.opacity(0.75))
-                    .padding(.horizontal, 24)
-
-                HStack(spacing: 10) {
-                    ForEach(0..<5) { _ in
-                        Image(systemName: "star.fill")
-                            .foregroundStyle(.yellow)
-                    }
-                }
-                .font(.title2)
-
-                Spacer()
-
-                Button("Rate Now") {
-                    onContinue()
-                }
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 15)
-                .background(.white, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .foregroundStyle(.black)
-
-                Button("Maybe Later") {
-                    onContinue()
-                }
-                .foregroundStyle(.white.opacity(0.8))
-                .padding(.bottom, 20)
-            }
-            .padding(.horizontal, 18)
-        }
-    }
-}
-
-struct IntroPaywallScreen: View {
-    @State private var selectedPlan = "weekly"
-    let onClose: () -> Void
-
-    var body: some View {
-        ZStack {
-            LinearGradient(colors: [Color.black, Color(red: 0.08, green: 0.1, blue: 0.2)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-
-            VStack(spacing: 16) {
-                Spacer(minLength: 20)
-
-                Text("Unlock Anima Premium")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-
-                Text("3-day free trial on weekly plan")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.mint)
-
-                VStack(spacing: 12) {
-                    planCard(
-                        id: "weekly",
-                        title: "Weekly",
-                        subtitle: "3-day free trial, then $6.99/week"
-                    )
-
-                    planCard(
-                        id: "yearly",
-                        title: "Yearly",
-                        subtitle: "$39.99/year (best value)"
-                    )
-                }
-
-                Button("Continue") {
-                    onClose()
-                }
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 15)
-                .background(.white, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .foregroundStyle(.black)
-                .padding(.top, 6)
-
-                Button("Restore Purchases") {}
-                    .foregroundStyle(.white.opacity(0.75))
-                    .font(.footnote)
-
-                Button("Not now") {
-                    onClose()
-                }
-                .foregroundStyle(.white.opacity(0.65))
-                .font(.footnote)
-                .padding(.bottom, 18)
-            }
-            .padding(.horizontal, 18)
-        }
-    }
-
-    @ViewBuilder
-    private func planCard(id: String, title: String, subtitle: String) -> some View {
-        Button {
-            selectedPlan = id
-        } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                    Text(subtitle)
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.74))
-                }
-                Spacer()
-                Image(systemName: selectedPlan == id ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(selectedPlan == id ? .mint : .white.opacity(0.5))
-                    .font(.title3)
-            }
-            .padding(14)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(selectedPlan == id ? .mint : .white.opacity(0.2), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-// MARK: - Main App
-
-struct MainTabView: View {
     var body: some View {
         TabView {
-            SessionsView()
-                .tabItem { Label("Sessions", systemImage: "waveform") }
-
-            ProgressViewScreen()
-                .tabItem { Label("Progress", systemImage: "chart.bar") }
-
-            SettingsScreen()
-                .tabItem { Label("Settings", systemImage: "gearshape") }
+            HomeLogView(vm: vm, doses: doses)
+                .tabItem { Label("Log", systemImage: "plus.circle") }
+            HistoryView(vm: vm)
+                .tabItem { Label("History", systemImage: "clock.arrow.circlepath") }
+            StatsView(vm: vm)
+                .tabItem { Label("Stats", systemImage: "chart.bar") }
+            SettingsView(vm: vm)
+                .tabItem { Label("Settings", systemImage: "gear") }
         }
-        .tint(.cyan)
     }
 }
 
-struct SessionsView: View {
-    @State private var showPaywall = false
-    @State private var selected = 0
-
-    private let presets: [SessionPreset] = [
-        .init(title: "Deep Focus", subtitle: "Beta 40Hz + Rain", minutes: 25, icon: "brain.head.profile"),
-        .init(title: "Calm Breath", subtitle: "Alpha 10Hz + Wind", minutes: 15, icon: "wind"),
-        .init(title: "Night Drift", subtitle: "Delta 2Hz + Ocean", minutes: 45, icon: "moon.zzz")
-    ]
+private struct HomeLogView: View {
+    @ObservedObject var vm: GLP1TrackerViewModel
+    let doses: [Double]
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                LinearGradient(colors: [Color(red: 0.04, green: 0.06, blue: 0.12), .black], startPoint: .top, endPoint: .bottom)
-                    .ignoresSafeArea()
-
-                ScrollView {
-                    VStack(spacing: 14) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Your Mind, Tuned")
-                                .font(.system(size: 30, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
-                            Text("Choose a preset and start your session.")
-                                .foregroundStyle(.white.opacity(0.72))
+            List {
+                Section("Next Shot") {
+                    if let nextDate = vm.nextInjectionDate {
+                        HStack {
+                            Label(nextDate.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
+                            Spacer()
+                            Text(daysRemainingLabel).foregroundStyle(.secondary)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(18)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-
-                        ForEach(Array(presets.enumerated()), id: \.offset) { idx, preset in
-                            Button {
-                                selected = idx
-                            } label: {
-                                HStack(spacing: 14) {
-                                    Image(systemName: preset.icon)
-                                        .font(.title3)
-                                        .frame(width: 42, height: 42)
-                                        .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                        .foregroundStyle(.white)
-
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(preset.title)
-                                            .font(.headline)
-                                            .foregroundStyle(.white)
-                                        Text(preset.subtitle)
-                                            .font(.subheadline)
-                                            .foregroundStyle(.white.opacity(0.72))
-                                    }
-                                    Spacer()
-                                    Text("\(preset.minutes)m")
-                                        .font(.subheadline.weight(.bold))
-                                        .foregroundStyle(.white)
-                                }
-                                .padding(14)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                        .fill(.ultraThinMaterial)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                                .stroke(selected == idx ? .cyan : .white.opacity(0.2), lineWidth: 1)
-                                        )
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
-
-                        Button("Start Session") {}
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(
-                                LinearGradient(colors: [.cyan, .blue], startPoint: .leading, endPoint: .trailing),
-                                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            )
-                            .foregroundStyle(.white)
-
-                        Button("Unlock Premium") {
-                            showPaywall = true
-                        }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white.opacity(0.9))
+                    } else {
+                        Text("No injections logged yet").foregroundStyle(.secondary)
                     }
-                    .padding(16)
+                }
+                Section("Log Injection") {
+                    DatePicker("Date", selection: $vm.selectedDate, displayedComponents: .date)
+                    Picker("Dose", selection: $vm.selectedDose) {
+                        ForEach(doses, id: \.self) { dose in
+                            Text("\(dose, specifier: "%.2g") mg").tag(dose)
+                        }
+                    }
+                    TextField("Optional note", text: $vm.note)
+                    Button("Add Injection") { vm.addInjection() }
+                        .buttonStyle(.borderedProminent)
                 }
             }
-            .navigationTitle("Anima")
-            .navigationBarTitleDisplayMode(.inline)
-            .fullScreenCover(isPresented: $showPaywall) {
-                IntroPaywallScreen {}
-            }
+            .navigationTitle("GLP-1 Tracker")
+        }
+    }
+
+    private var daysRemainingLabel: String {
+        guard let days = vm.daysUntilNextShot else { return "" }
+        switch days {
+        case ..<0: return "Overdue"
+        case 0: return "Today"
+        case 1: return "1 day"
+        default: return "\(days) days"
         }
     }
 }
 
-struct ProgressViewScreen: View {
+private struct HistoryView: View {
+    @ObservedObject var vm: GLP1TrackerViewModel
     var body: some View {
         NavigationStack {
             List {
-                Section("This Week") {
-                    Label("5 sessions completed", systemImage: "checkmark.circle")
-                    Label("132 total minutes", systemImage: "timer")
-                    Label("2 day streak", systemImage: "flame")
+                if vm.entries.isEmpty {
+                    Text("Your injection history will appear here").foregroundStyle(.secondary)
+                } else {
+                    ForEach(vm.entries) { entry in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(entry.date.formatted(date: .abbreviated, time: .omitted)).font(.headline)
+                                Spacer()
+                                Text("\(entry.doseMg, specifier: "%.2g") mg").foregroundStyle(.secondary)
+                            }
+                            if !entry.note.isEmpty {
+                                Text(entry.note).font(.footnote).foregroundStyle(.secondary)
+                            }
+                        }.padding(.vertical, 2)
+                    }
+                    .onDelete(perform: vm.deleteEntries)
                 }
             }
-            .navigationTitle("Progress")
+            .navigationTitle("History")
         }
     }
 }
 
-struct SettingsScreen: View {
-    @State private var haptics = true
-    @State private var notifications = true
-
+private struct StatsView: View {
+    @ObservedObject var vm: GLP1TrackerViewModel
     var body: some View {
         NavigationStack {
             List {
-                Section("Playback") {
-                    Toggle("Haptics", isOn: $haptics)
-                    Toggle("Session Reminders", isOn: $notifications)
+                Section("Adherence") {
+                    LabeledContent("Current streak") { Text("\(vm.adherenceStreakWeeks) week\(vm.adherenceStreakWeeks == 1 ? "" : "s")") }
+                    LabeledContent("Shots this month") { Text("\(vm.completedThisMonth)") }
+                    LabeledContent("Total shots") { Text("\(vm.entries.count)") }
                 }
-                Section("About") {
-                    Label("Version 1.0", systemImage: "info.circle")
-                    Label("Privacy Policy", systemImage: "hand.raised")
+            }
+            .navigationTitle("Stats")
+        }
+    }
+}
+
+private struct SettingsView: View {
+    @ObservedObject var vm: GLP1TrackerViewModel
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Defaults") {
+                    LabeledContent("Default dose") { Text("\(vm.defaultDose, specifier: "%.2g") mg") }
+                }
+                Section("Reminder") {
+                    Toggle("Enable weekly reminder", isOn: $vm.reminderEnabled)
+                    Stepper("Reminder hour: \(vm.reminderHour):00", value: $vm.reminderHour, in: 0...23)
+                        .disabled(!vm.reminderEnabled)
+                    Text("Notification wiring is the next step. Settings are persisted.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
             }
             .navigationTitle("Settings")
