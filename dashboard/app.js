@@ -99,7 +99,10 @@ function renderList(items) {
         <div class="row">Date: ${app.date}</div>
         <div class="row">Revenue: ${app.revenue}</div>
       </div>
-      <button class="prd-btn" data-key="${app.key}">PRD</button>
+      <button class="prd-btn" data-key="${app.key}" title="Open PRD">
+        <span class="prd-icon">🧾</span>
+        <span>PRD</span>
+      </button>
     </article>
   `
     )
