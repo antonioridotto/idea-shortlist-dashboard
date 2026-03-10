@@ -1,48 +1,51 @@
 [
   {
+    "date": "2026-03-10",
     "timestamp": "2026-03-10T08:30:00+01:00",
     "selected3": [
       {
         "name": "Cursor AI Mobile - Remote IDE",
         "link": "https://apps.apple.com/us/app/cursor-ai-mobile-remote-ide/id6755931330",
-        "revenue": null
+        "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/4f/05/de/4f05de09-03dd-0a87-d210-f4a10f2d899f/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/100x100bb.jpg",
+        "revenue": "N/A"
       },
       {
         "name": "Clouder for Cloudflare",
         "link": "https://apps.apple.com/us/app/clouder-for-cloudflare/id6755757771",
-        "revenue": null
+        "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/f8/a0/4e/f8a04e9b-990c-488a-1c6e-30b90b3fdc08/AppIcon-0-0-1x_U007epad-0-1-85-220.png/100x100bb.jpg",
+        "revenue": "N/A"
       },
       {
         "name": "Tornado Tracker by TornadoPath",
         "link": "https://apps.apple.com/us/app/tornado-tracker-by-tornadopath/id6756027933",
-        "revenue": null
+        "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/11/84/f5/1184f5fa-e31e-8c16-1fe4-ea7ed7d06fd8/AppIcon-0-0-1x_U007epad-0-1-85-220.png/100x100bb.jpg",
+        "revenue": "N/A"
       }
     ],
-    "winner": "Cursor AI Mobile - Remote IDE",
-    "date": "2026-03-10"
+    "winner": "Cursor AI Mobile - Remote IDE"
   },
   {
+    "date": "2026-03-09",
     "timestamp": "2026-03-09T09:07:00+01:00",
     "selected3": [],
-    "winner": "",
-    "date": "2026-03-09"
+    "winner": ""
   },
   {
+    "date": "2026-03-07",
     "timestamp": "2026-03-07T09:35:00+01:00",
     "selected3": [],
-    "winner": "",
-    "date": "2026-03-07"
+    "winner": ""
   },
   {
+    "date": "2026-03-06",
     "timestamp": "2026-03-06T08:30:00+01:00",
     "selected3": [],
-    "winner": "",
-    "date": "2026-03-06"
+    "winner": ""
   },
   {
+    "date": "2026-03-05",
     "timestamp": "2026-03-05T09:29:00+01:00",
     "selected3": [],
-    "winner": "",
-    "date": "2026-03-05"
+    "winner": ""
   }
 ]

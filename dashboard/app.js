@@ -9,37 +9,46 @@ async function loadData() {
   }
 }
 
-function render(rows) {
-  const tbody = document.querySelector('#tbl tbody');
-  tbody.innerHTML = '';
+function flatten(rows) {
+  const out = [];
+  for (const day of rows) {
+    const date = day.date || '—';
+    for (const app of (day.selected3 || [])) {
+      const name = app?.name || 'Unknown app';
+      out.push({
+        date,
+        name,
+        link: app?.link || '',
+        icon: app?.icon || '',
+        revenue: app?.revenue || 'N/A',
+        winner: day.winner === name
+      });
+    }
+  }
+  return out.sort((a,b) => b.date.localeCompare(a.date));
+}
 
-  const useful = rows.filter(r => (r.selected3 && r.selected3.length));
-  if (!useful.length) {
-    tbody.innerHTML = `<tr><td colspan="2">No shortlist data yet.</td></tr>`;
+function render(rows) {
+  const root = document.getElementById('appList');
+  const items = flatten(rows);
+  if (!items.length) {
+    root.innerHTML = '<div class="item"><div class="meta">No shortlist data yet.</div></div>';
     return;
   }
-
-  for (const r of useful) {
-    const tr = document.createElement('tr');
-    const selected3 = (r.selected3 || [])
-      .map(item => {
-        const name = item?.name || 'Unknown app';
-        const link = item?.link || '';
-        const revenue = item?.revenue || 'N/A';
-        const star = (name === r.winner) ? '<span class="star">⭐</span> ' : '';
-        const nameHtml = link
-          ? `${star}<a class="app-link" href="${link}" target="_blank" rel="noreferrer">${name}</a>`
-          : `${star}<span>${name}</span>`;
-        return `<li class="app-item">${nameHtml}<div class="rev">Revenue: ${revenue}</div></li>`;
-      })
-      .join('');
-
-    tr.innerHTML = `
-      <td>${r.date || '—'}</td>
-      <td><ul class="app-list">${selected3}</ul></td>
-    `;
-    tbody.appendChild(tr);
-  }
+  root.innerHTML = items.map(app => `
+    <article class="item">
+      <img class="icon" src="${app.icon || ''}" alt="${app.name}" onerror="this.style.visibility='hidden'" />
+      <div class="meta">
+        <div class="title">
+          ${app.winner ? '<span class="star">⭐</span>' : ''}
+          ${app.link ? `<a href="${app.link}" target="_blank" rel="noreferrer">${app.name}</a>` : app.name}
+          ${app.winner ? '<span class="badge">Winner</span>' : ''}
+        </div>
+        <div class="row">Date: ${app.date}</div>
+        <div class="row">Revenue: ${app.revenue}</div>
+      </div>
+    </article>
+  `).join('');
 }
 
 loadData().then(render);
