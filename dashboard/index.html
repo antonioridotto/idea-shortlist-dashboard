@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Antonio's Shortlist HQ</title>
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body>
   <main class="wrap">
@@ -25,6 +25,20 @@
     <section id="appList" class="list"></section>
   </main>
 
-  <script src="app.js?v=7"></script>
+  <div id="prdModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="prdTitle">PRD</h3>
+        <button id="closePrdBtn" class="ghost">✕</button>
+      </div>
+      <textarea id="prdText" placeholder="PRD content..."></textarea>
+      <div class="modal-actions">
+        <button id="savePrdBtn">Save</button>
+        <button id="copyPrdBtn" class="ghost">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=8"></script>
 </body>
 </html>

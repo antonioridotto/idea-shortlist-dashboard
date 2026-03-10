@@ -7,19 +7,22 @@
         "name": "Cursor AI Mobile - Remote IDE",
         "link": "https://apps.apple.com/us/app/cursor-ai-mobile-remote-ide/id6755931330",
         "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/4f/05/de/4f05de09-03dd-0a87-d210-f4a10f2d899f/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/100x100bb.jpg",
-        "revenue": "$30,368"
+        "revenue": "$30,368",
+        "prd": "# PRD — Cursor AI Mobile - Remote IDE\n\n## Problem\nDevelopers often need to check logs, run quick commands, and respond to incidents while away from laptop. Existing mobile tools are slow and context-poor.\n\n## Target User\n- Indie founders\n- On-call developers\n- Small engineering teams\n\n## MVP Scope\n1. Secure host connection list\n2. Quick command panel (restart, health checks, logs tail)\n3. Session output viewer\n4. Push notification on command completion\n5. Basic audit history\n\n## Success Metrics\n- Day-7 retention > 20%\n- 3+ sessions per active user/week\n- Trial-to-paid conversion > 4%\n\n## Monetization\n- Free: 1 host + basic commands\n- Pro monthly: multiple hosts, saved workflows, alerts\n\n## Risks\n- Security trust concerns\n- Strong incumbents in dev tooling\n"
       },
       {
         "name": "Clouder for Cloudflare",
         "link": "https://apps.apple.com/us/app/clouder-for-cloudflare/id6755757771",
         "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/f8/a0/4e/f8a04e9b-990c-488a-1c6e-30b90b3fdc08/AppIcon-0-0-1x_U007epad-0-1-85-220.png/100x100bb.jpg",
-        "revenue": "$23,129"
+        "revenue": "$23,129",
+        "prd": "# PRD — Clouder for Cloudflare\n\n## Problem\nCloudflare users need quick infra actions on mobile (DNS fix, cache purge, worker status), but desktop-first dashboards are heavy on phone.\n\n## Target User\n- Solo builders managing infra\n- Small agencies\n- DevOps-minded teams\n\n## MVP Scope\n1. Zone list and health status\n2. DNS read/write\n3. Cache purge one-tap\n4. Worker and Pages deployment status\n5. Event log and alert feed\n\n## Success Metrics\n- Weekly active rate > 30%\n- Core action completion < 20 sec median\n- Paid conversion > 3%\n\n## Monetization\n- Free: read-only + limited actions\n- Pro: full write operations, multi-account, alerts\n\n## Risks\n- API dependency changes\n- Brand/trademark compliance pressure\n"
       },
       {
         "name": "Tornado Tracker by TornadoPath",
         "link": "https://apps.apple.com/us/app/tornado-tracker-by-tornadopath/id6756027933",
         "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/11/84/f5/1184f5fa-e31e-8c16-1fe4-ea7ed7d06fd8/AppIcon-0-0-1x_U007epad-0-1-85-220.png/100x100bb.jpg",
-        "revenue": "$16,516"
+        "revenue": "$16,516",
+        "prd": "# PRD — Tornado Tracker by TornadoPath\n\n## Problem\nPeople in high-risk weather regions need faster, clearer warning signals than generic weather apps provide.\n\n## Target User\n- Families in tornado-prone states\n- Storm chasers\n- Local emergency volunteers\n\n## MVP Scope\n1. Real-time warning map\n2. Saved locations + alert radius\n3. Push + SMS escalation\n4. Risk timeline (next 6h)\n5. Safety checklist mode\n\n## Success Metrics\n- Alert open rate > 35%\n- 7-day retention > 25% during active weather periods\n- Premium conversion > 2.5%\n\n## Monetization\n- Free: map + basic alerts\n- Premium: advanced layers, family sharing, SMS fallback\n\n## Risks\n- False alert perception can hurt trust\n- Seasonality causes uneven usage\n"
       }
     ],
     "winner": "Cursor AI Mobile - Remote IDE"
