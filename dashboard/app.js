@@ -42,13 +42,35 @@ function setStoredPrd(key, value) {
   localStorage.setItem(`prd::${key}`, value || '');
 }
 
+function ensureModal() {
+  let modal = document.getElementById('prdModal');
+  if (modal) return modal;
+  const html = `
+    <div id="prdModal" class="modal">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3 id="prdTitle">PRD</h3>
+          <button id="closePrdBtn" class="ghost">✕</button>
+        </div>
+        <textarea id="prdText" placeholder="PRD content..."></textarea>
+        <div class="modal-actions">
+          <button id="savePrdBtn">Save</button>
+          <button id="copyPrdBtn" class="ghost">Copy</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+  return document.getElementById('prdModal');
+}
+
 function openPrdModal(app) {
-  const modal = document.getElementById('prdModal');
+  const modal = ensureModal();
   const title = document.getElementById('prdTitle');
   const textarea = document.getElementById('prdText');
   const saveBtn = document.getElementById('savePrdBtn');
   const copyBtn = document.getElementById('copyPrdBtn');
   const closeBtn = document.getElementById('closePrdBtn');
+  if (!modal || !title || !textarea || !saveBtn || !copyBtn || !closeBtn) return;
 
   title.textContent = `${app.name} — PRD`;
   textarea.value = getStoredPrd(app.key) || app.prd || '';
