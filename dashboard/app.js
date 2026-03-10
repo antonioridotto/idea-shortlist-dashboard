@@ -99,9 +99,12 @@ function renderList(items) {
         <div class="row">Date: ${app.date}</div>
         <div class="row">Revenue: ${app.revenue}</div>
       </div>
-      <button class="prd-btn" data-key="${app.key}" title="Open PRD">
-        <span class="prd-icon">🧾</span>
-        <span>PRD</span>
+      <button class="prd-btn" data-key="${app.key}" title="Open PRD" aria-label="Open PRD">
+        <svg class="prd-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 13h6M9 17h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
       </button>
     </article>
   `
