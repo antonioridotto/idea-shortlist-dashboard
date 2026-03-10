@@ -23,8 +23,9 @@ function render(rows) {
     const tr = document.createElement('tr');
     const selected3 = (r.selected3 || [])
       .map(item => {
-        const name = item?.name || item;
-        const link = item?.link || '';
+        const isObj = item && typeof item === 'object';
+        const name = isObj ? (item.name || item.app_name || item.title || 'Unknown app') : String(item);
+        const link = isObj ? (item.link || item.app_store_link || '') : '';
         return link
           ? `<a class="chip" href="${link}" target="_blank" rel="noreferrer">${name}</a>`
           : `<span class="chip">${name}</span>`;
