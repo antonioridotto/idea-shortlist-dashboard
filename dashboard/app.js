@@ -13,9 +13,9 @@ function render(rows) {
   const tbody = document.querySelector('#tbl tbody');
   tbody.innerHTML = '';
 
-  const useful = rows.filter(r => (r.selected3 && r.selected3.length) || r.winner);
+  const useful = rows.filter(r => (r.selected3 && r.selected3.length));
   if (!useful.length) {
-    tbody.innerHTML = `<tr><td colspan="3">No shortlist data yet.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="2">No shortlist data yet.</td></tr>`;
     return;
   }
 
@@ -23,25 +23,20 @@ function render(rows) {
     const tr = document.createElement('tr');
     const selected3 = (r.selected3 || [])
       .map(item => {
-        const isObj = item && typeof item === 'object';
-        const name = isObj ? (item.name || item.app_name || item.title || 'Unknown app') : String(item);
-        const link = isObj ? (item.link || item.app_store_link || '') : '';
-        return link
-          ? `<a class="chip" href="${link}" target="_blank" rel="noreferrer">${name}</a>`
-          : `<span class="chip">${name}</span>`;
+        const name = item?.name || 'Unknown app';
+        const link = item?.link || '';
+        const revenue = item?.revenue || 'N/A';
+        const star = (name === r.winner) ? '<span class="star">⭐</span> ' : '';
+        const nameHtml = link
+          ? `${star}<a class="app-link" href="${link}" target="_blank" rel="noreferrer">${name}</a>`
+          : `${star}<span>${name}</span>`;
+        return `<li class="app-item">${nameHtml}<div class="rev">Revenue: ${revenue}</div></li>`;
       })
       .join('');
 
-    const winnerHtml = r.winner
-      ? (r.winner_link
-          ? `<span class="star">⭐</span> <a href="${r.winner_link}" target="_blank" rel="noreferrer">${r.winner}</a>`
-          : `<span class="star">⭐</span> ${r.winner}`)
-      : '—';
-
     tr.innerHTML = `
       <td>${r.date || '—'}</td>
-      <td><div class="chips">${selected3 || '—'}</div></td>
-      <td>${winnerHtml}</td>
+      <td><ul class="app-list">${selected3}</ul></td>
     `;
     tbody.appendChild(tr);
   }

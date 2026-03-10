@@ -4,47 +4,45 @@
     "selected3": [
       {
         "name": "Cursor AI Mobile - Remote IDE",
-        "link": "https://apps.apple.com/us/app/cursor-ai-mobile-remote-ide/id6755931330"
+        "link": "https://apps.apple.com/us/app/cursor-ai-mobile-remote-ide/id6755931330",
+        "revenue": null
       },
       {
         "name": "Clouder for Cloudflare",
-        "link": "https://apps.apple.com/us/app/clouder-for-cloudflare/id6755757771"
+        "link": "https://apps.apple.com/us/app/clouder-for-cloudflare/id6755757771",
+        "revenue": null
       },
       {
         "name": "Tornado Tracker by TornadoPath",
-        "link": "https://apps.apple.com/us/app/tornado-tracker-by-tornadopath/id6756027933"
+        "link": "https://apps.apple.com/us/app/tornado-tracker-by-tornadopath/id6756027933",
+        "revenue": null
       }
     ],
     "winner": "Cursor AI Mobile - Remote IDE",
-    "winner_link": "https://apps.apple.com/us/app/cursor-ai-mobile-remote-ide/id6755931330",
     "date": "2026-03-10"
   },
   {
     "timestamp": "2026-03-09T09:07:00+01:00",
     "selected3": [],
     "winner": "",
-    "winner_link": "",
     "date": "2026-03-09"
   },
   {
     "timestamp": "2026-03-07T09:35:00+01:00",
     "selected3": [],
     "winner": "",
-    "winner_link": "",
     "date": "2026-03-07"
   },
   {
     "timestamp": "2026-03-06T08:30:00+01:00",
     "selected3": [],
     "winner": "",
-    "winner_link": "",
     "date": "2026-03-06"
   },
   {
     "timestamp": "2026-03-05T09:29:00+01:00",
     "selected3": [],
     "winner": "",
-    "winner_link": "",
     "date": "2026-03-05"
   }
 ]
