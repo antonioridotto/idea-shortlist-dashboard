@@ -1,4 +1,5 @@
 const ACCESS_CODE = 'ibrahim-hq-2026';
+const MANUAL_SEND_CODE = 'build-send-2026';
 
 function enforceGate() {
   const saved = localStorage.getItem('shortlist_gate_ok');
@@ -225,6 +226,12 @@ function renderList(items) {
 
   root.querySelectorAll('.build-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
+      const entered = window.prompt('Enter manual send code');
+      if (entered !== MANUAL_SEND_CODE) {
+        alert('Invalid send code');
+        return;
+      }
+
       const app = byKey[btn.dataset.buildKey];
       btn.disabled = true;
       btn.textContent = 'Sending...';
