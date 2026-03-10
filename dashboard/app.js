@@ -21,7 +21,16 @@ function render(rows) {
 
   for (const r of useful) {
     const tr = document.createElement('tr');
-    const selected3 = (r.selected3 || []).map(x => `<span class="chip">${x}</span>`).join('');
+    const selected3 = (r.selected3 || [])
+      .map(item => {
+        const name = item?.name || item;
+        const link = item?.link || '';
+        return link
+          ? `<a class="chip" href="${link}" target="_blank" rel="noreferrer">${name}</a>`
+          : `<span class="chip">${name}</span>`;
+      })
+      .join('');
+
     const winnerHtml = r.winner
       ? (r.winner_link
           ? `<span class="star">⭐</span> <a href="${r.winner_link}" target="_blank" rel="noreferrer">${r.winner}</a>`
