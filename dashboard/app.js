@@ -1,3 +1,23 @@
+const ACCESS_CODE = 'ibrahim-hq-2026';
+
+function enforceGate() {
+  const saved = localStorage.getItem('shortlist_gate_ok');
+  if (saved === '1') return true;
+
+  const entered = window.prompt('Enter access code');
+  if (entered === ACCESS_CODE) {
+    localStorage.setItem('shortlist_gate_ok', '1');
+    return true;
+  }
+
+  document.body.innerHTML = '<main style="font-family: -apple-system, Inter, sans-serif; color:#e5e7eb; background:#020617; min-height:100vh; display:flex; align-items:center; justify-content:center;">Access denied</main>';
+  return false;
+}
+
+if (!enforceGate()) {
+  throw new Error('Gate blocked');
+}
+
 async function loadData() {
   try {
     const res = await fetch('./data.json', { cache: 'no-store' });
