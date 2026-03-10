@@ -25,23 +25,22 @@ function flatten(rows) {
       });
     }
   }
-  return out.sort((a,b) => b.date.localeCompare(a.date));
+  return out.sort((a, b) => b.date.localeCompare(a.date));
 }
 
-function render(rows) {
+function renderList(items) {
   const root = document.getElementById('appList');
-  const items = flatten(rows);
   if (!items.length) {
-    root.innerHTML = '<div class="item"><div class="meta">No shortlist data yet.</div></div>';
+    root.innerHTML = '<div class="item"><div class="meta">No items for this filter.</div></div>';
     return;
   }
+
   root.innerHTML = items.map(app => `
     <article class="item">
       <img class="icon" src="${app.icon || ''}" alt="${app.name}" onerror="this.style.visibility='hidden'" />
       <div class="meta">
         <div class="title">
-          ${app.winner ? '<span class="star">⭐</span>' : ''}
-          ${app.link ? `<a href="${app.link}" target="_blank" rel="noreferrer">${app.name}</a>` : app.name}
+          ${app.link ? `<a class="app-link" href="${app.link}" target="_blank" rel="noreferrer">${app.name}</a>` : app.name}
           ${app.winner ? '<span class="badge">Winner</span>' : ''}
         </div>
         <div class="row">Date: ${app.date}</div>
@@ -51,4 +50,16 @@ function render(rows) {
   `).join('');
 }
 
-loadData().then(render);
+loadData().then(rows => {
+  const allItems = flatten(rows);
+  const filterEl = document.getElementById('viewFilter');
+
+  function applyFilter() {
+    const mode = filterEl?.value || 'all';
+    const filtered = mode === 'winners' ? allItems.filter(x => x.winner) : allItems;
+    renderList(filtered);
+  }
+
+  filterEl?.addEventListener('change', applyFilter);
+  applyFilter();
+});
