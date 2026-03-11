@@ -1,27 +1,38 @@
 {
   "app": {
-    "name": "APP_NAME",
-    "description": "",
-    "audience": "",
-    "problem": "",
-    "differentiator": "",
-    "appStoreUrl": "",
-    "category": "",
+    "name": "Binaural Beats - Sleep",
+    "description": "Fall asleep faster. Focus sharper. Relax deeper. Binaural frequencies guide brain states for sleep, focus, relaxation, meditation, healing, and energy.",
+    "audience": "People struggling with sleep, focus, studying, stress, or relaxation routines.",
+    "problem": "People cannot reliably switch into the right mental state for sleep, focus, and calm with simple repeatable habits.",
+    "differentiator": "Scientifically tuned binaural programs with category-based sessions, personalization, and effortless bedtime flow.",
+    "appStoreUrl": "https://apps.apple.com/us/app/binaural-beats-sleep/id6760032714",
+    "category": "health & fitness",
     "isMobileApp": true,
-    "features": [],
-    "priceModel": "",
-    "visualStyle": "",
-    "valueProposition": ""
+    "features": [
+      "100+ binaural programs",
+      "sleep timer with auto-fade",
+      "background playback",
+      "personalized recommendations",
+      "nature sound backdrops",
+      "live lock-screen controls"
+    ],
+    "priceModel": "subscription",
+    "visualStyle": "minimal, emotional, bold, informative, organic, calm",
+    "valueProposition": "Fall asleep faster, focus deeper, and relax on demand with science-backed binaural sessions.",
+    "toneHint": "minimal, emotional, bold, informative, organic, calm"
   },
   "imageGen": {
     "provider": "falai",
-    "apiKey": "USE_SHARED_OR_SET_HERE",
+    "apiKey": "c20980ee-1c6e-4353-b436-d1be5b18980b:ece307f6c75653768cd58154f42f8be6",
     "model": "fal-ai/nano-banana-2",
-    "basePrompt": ""
+    "basePrompt": "iPhone photo, realistic lighting, portrait 9:16, social-friendly composition, high detail, natural colors"
   },
   "postiz": {
-    "apiKey": "USE_SHARED_OR_SET_HERE",
-    "integrationId": "SET_PER_APP_TIKTOK_INTEGRATION_ID"
+    "apiKey": "6d93599bcb4ac2656b1ba1001b4371d335fef46b30c2cbdbd9eb6ea90f6c1aee",
+    "integrationIds": {
+      "tiktok": "cmmkzfkoo01y6qn0yogt91sre"
+    },
+    "integrationId": "cmmkzfkoo01y6qn0yogt91sre"
   },
   "revenuecat": {
     "enabled": false,
@@ -31,10 +42,10 @@
   "posting": {
     "privacyLevel": "SELF_ONLY",
     "schedule": [
-      "08:00",
-      "12:00",
-      "16:00",
-      "20:00"
-    ]
+      "07:30",
+      "16:30",
+      "21:00"
+    ],
+    "crossPost": []
   }
 }
