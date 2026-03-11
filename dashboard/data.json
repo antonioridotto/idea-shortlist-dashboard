@@ -1,11 +1,11 @@
 [
   {
     "date": "2026-03-11",
-    "timestamp": "2026-03-11T10:26:00+01:00",
+    "timestamp": "2026-03-11T10:36:00+01:00",
     "selected3": [],
     "winner": "",
     "status": "insufficient_candidates",
-    "reason": "Strict rule set applied (release window + exact revenue + content-heavy exclusion + exclude/history dedupe). No 3 fully valid candidates found for test rerun."
+    "reason": "Re-run completed with locked rules. Apptica locked pages scanned (30/60/90, pages 1-10) but raw app rows were non-retrievable in this run context; strict pipeline returned no valid shortlist."
   },
   {
     "date": "2026-03-10",
