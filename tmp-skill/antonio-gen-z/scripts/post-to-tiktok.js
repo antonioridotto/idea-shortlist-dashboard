@@ -107,14 +107,31 @@ async function uploadImage(filePath) {
 
   // Save metadata
   const metaPath = path.join(dir, 'meta.json');
+  const postizPostId = result[0]?.postId;
+  const postedAt = new Date().toISOString();
   const meta = {
-    postId: result[0]?.postId,
+    postId: postizPostId,
+    postizPostId,
     caption,
     title,
     privacy,
-    postedAt: new Date().toISOString(),
+    postedAt,
     images: images.length
   };
   fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
   console.log(`📋 Metadata saved to ${metaPath}`);
+
+  // Append durable post index for reliable analytics reconciliation
+  // Location: <config dir>/post-index.jsonl
+  const indexPath = path.join(path.dirname(configPath), 'post-index.jsonl');
+  const indexRow = {
+    postizPostId,
+    postedAt,
+    title,
+    caption,
+    localDir: dir,
+    integrationId: config.postiz.integrationId
+  };
+  fs.appendFileSync(indexPath, JSON.stringify(indexRow) + '\n');
+  console.log(`🧾 Indexed post in ${indexPath}`);
 })();

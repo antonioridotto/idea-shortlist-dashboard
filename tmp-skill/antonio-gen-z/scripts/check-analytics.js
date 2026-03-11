@@ -45,6 +45,27 @@ if (!configPath) {
 const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 const BASE_URL = 'https://api.postiz.com/public/v1';
 const API_KEY = config.postiz.apiKey;
+const baseDir = path.dirname(configPath);
+const postIndexPath = path.join(baseDir, 'post-index.jsonl');
+const releaseMapPath = path.join(baseDir, 'release-map.json');
+
+function loadIndexedPostIds() {
+  if (!fs.existsSync(postIndexPath)) return null;
+  const lines = fs.readFileSync(postIndexPath, 'utf-8').split('\n').filter(Boolean);
+  const ids = lines.map(l => {
+    try { return JSON.parse(l).postizPostId; } catch { return null; }
+  }).filter(Boolean);
+  return new Set(ids);
+}
+
+function loadReleaseMap() {
+  if (!fs.existsSync(releaseMapPath)) return {};
+  try { return JSON.parse(fs.readFileSync(releaseMapPath, 'utf-8')); } catch { return {}; }
+}
+
+function saveReleaseMap(map) {
+  fs.writeFileSync(releaseMapPath, JSON.stringify(map, null, 2));
+}
 
 async function api(method, endpoint, body = null) {
   const opts = {
@@ -78,6 +99,12 @@ async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
   // Filter to TikTok posts only
   posts = posts.filter(p => p.integration?.providerIdentifier === 'tiktok');
 
+  // Prefer durable index from post-to-tiktok (postizPostId list)
+  const indexedIds = loadIndexedPostIds();
+  if (indexedIds && indexedIds.size > 0) {
+    posts = posts.filter(p => indexedIds.has(p.id));
+  }
+
   // Sort by publish date (oldest first)
   posts.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
 
@@ -101,6 +128,8 @@ async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
   // 3. If there are connectable unconnected posts, get the TikTok video list
   if (connectableUnconnected.length > 0 && shouldConnect) {
+    const releaseMap = loadReleaseMap();
+
     // Use a healthy published unconnected post to get the missing list
     // (ERROR-state posts often return empty missing lists)
     const referencePost = connectableUnconnected.find(p => p.state === 'PUBLISHED') || connectableUnconnected[0];
@@ -110,24 +139,25 @@ async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
     if (Array.isArray(tiktokVideos) && tiktokVideos.length > 0) {
       // TikTok IDs are sequential (higher = newer). Sort ascending.
       const videoIds = tiktokVideos.map(v => v.id).sort();
-      
-      // Get already-connected IDs to exclude them
-      const connectedIds = new Set(connected.map(p => p.releaseId));
-      const availableIds = videoIds.filter(id => !connectedIds.has(id));
 
-      console.log(`  Found ${videoIds.length} TikTok videos, ${availableIds.length} unconnected\n`);
+      // Exclude already connected and already mapped IDs
+      const connectedIds = new Set(connected.map(p => p.releaseId).filter(Boolean));
+      const mappedIds = new Set(Object.values(releaseMap));
+      const availableIds = videoIds.filter(id => !connectedIds.has(id) && !mappedIds.has(id));
 
-      // Sort unconnected posts by publish date (oldest first)
-      // Sort available IDs ascending (oldest first)
-      // Match them up chronologically
+      console.log(`  Found ${videoIds.length} TikTok videos, ${availableIds.length} available for new mapping\n`);
+
+      // Keep unresolved posts ordered by publish time
+      const unresolved = connectableUnconnected
+        .filter(p => !releaseMap[p.id])
+        .sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
+
+      // Map oldest unresolved posts to oldest available IDs (chronological)
       const sortedAvailable = availableIds.sort();
-      
-      // We need to match the N most recent available IDs to the N unconnected posts
-      // Take the last N available IDs (newest) to match with the unconnected posts
-      const idsToUse = sortedAvailable.slice(-connectableUnconnected.length);
+      const idsToUse = sortedAvailable.slice(0, unresolved.length);
 
-      for (let i = 0; i < connectableUnconnected.length; i++) {
-        const post = connectableUnconnected[i];
+      for (let i = 0; i < unresolved.length; i++) {
+        const post = unresolved[i];
         const videoId = idsToUse[i];
         
         if (!videoId) {
@@ -142,11 +172,15 @@ async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
         const result = await api('PUT', `/posts/${post.id}/release-id`, { releaseId: videoId });
         if (result.releaseId === videoId) {
           console.log(`     ✅ Connected`);
+          releaseMap[post.id] = videoId;
         } else {
           console.log(`     ⚠️ Connection returned: ${JSON.stringify(result.releaseId)}`);
         }
         await sleep(1000);
       }
+
+      saveReleaseMap(releaseMap);
+      console.log(`  🧾 Saved mapping to ${releaseMapPath}`);
       console.log('');
     } else {
       console.log(`  ⚠️ No TikTok videos found in missing list. Videos may need more time to index.\n`);
@@ -202,7 +236,6 @@ async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
   }
 
   // 5. Save results
-  const baseDir = path.dirname(configPath);
   const analyticsPath = path.join(baseDir, 'analytics-snapshot.json');
   const snapshot = {
     date: now.toISOString(),
