@@ -21,7 +21,7 @@ if (!enforceGate()) {
 
 async function loadData() {
   try {
-    const res = await fetch('./data.json', { cache: 'no-store' });
+    const res = await fetch(`./data.json?v=${Date.now()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('data.json not found');
     return await res.json();
   } catch (e) {
