@@ -1,34 +1,11 @@
 [
   {
     "date": "2026-03-11",
-    "timestamp": "2026-03-11T10:20:00+01:00",
-    "selected3": [
-      {
-        "name": "BP Companion",
-        "link": "https://apps.apple.com/us/app/bp-companion/id6759536780",
-        "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/7c/36/67/7c366775-5f31-9a07-a4fe-654f8f80dd4d/AppIcon-0-0-1x_U007epad-0-11-0-85-220.png/100x100bb.jpg",
-        "revenue": "$14k-$32k",
-        "prd": "MVP: blood pressure logging + trend insights + reminder nudges. Build with HealthKit-first local storage and simple premium insights.",
-        "build_sent": false
-      },
-      {
-        "name": "Derupt",
-        "link": "https://apps.apple.com/us/app/derupt/id6759691513",
-        "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/4a/86/e4/4a86e48b-2cdd-0d08-6efc-630347163b68/AppIcon-0-0-1x_U007epad-0-11-0-85-220.png/100x100bb.jpg",
-        "revenue": "$12k-$28k",
-        "prd": "MVP: context-aware task planner with energy-based slots, lightweight routines, and weekly focus analytics.",
-        "build_sent": false
-      },
-      {
-        "name": "SavePal",
-        "link": "https://apps.apple.com/us/app/savepal/id6754890175",
-        "icon": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/0b/45/68/0b45689f-2d90-f031-1d07-703676bc6d4f/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/100x100bb.jpg",
-        "revenue": "$10k-$22k",
-        "prd": "MVP: manual budget tracking + streaks + savings goals without bank API dependency.",
-        "build_sent": false
-      }
-    ],
-    "winner": "BP Companion"
+    "timestamp": "2026-03-11T10:26:00+01:00",
+    "selected3": [],
+    "winner": "",
+    "status": "insufficient_candidates",
+    "reason": "Strict rule set applied (release window + exact revenue + content-heavy exclusion + exclude/history dedupe). No 3 fully valid candidates found for test rerun."
   },
   {
     "date": "2026-03-10",
