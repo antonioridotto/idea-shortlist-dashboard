@@ -202,7 +202,8 @@ function renderList(items) {
           ${app.winner ? '<span class="badge">Winner</span>' : ''}
           ${app.buildSent ? '<span class="badge building">Building</span>' : ''}
         </div>
-        <div class="row">Date: ${app.date}</div>
+        <div class="row">Release date: ${app.release_date || app.releaseDate || '—'}</div>
+        <div class="row">Scan date: ${app.date}</div>
         <div class="row">Revenue: ${app.revenue}</div>
       </div>
       <button class="prd-btn" data-key="${app.key}" title="Open PRD" aria-label="Open PRD">
