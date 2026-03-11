@@ -1,0 +1,40 @@
+{
+  "app": {
+    "name": "APP_NAME",
+    "description": "",
+    "audience": "",
+    "problem": "",
+    "differentiator": "",
+    "appStoreUrl": "",
+    "category": "",
+    "isMobileApp": true,
+    "features": [],
+    "priceModel": "",
+    "visualStyle": "",
+    "valueProposition": ""
+  },
+  "imageGen": {
+    "provider": "falai",
+    "apiKey": "USE_SHARED_OR_SET_HERE",
+    "model": "fal-ai/nano-banana-2",
+    "basePrompt": ""
+  },
+  "postiz": {
+    "apiKey": "USE_SHARED_OR_SET_HERE",
+    "integrationId": "SET_PER_APP_TIKTOK_INTEGRATION_ID"
+  },
+  "revenuecat": {
+    "enabled": false,
+    "v2SecretKey": "",
+    "projectId": ""
+  },
+  "posting": {
+    "privacyLevel": "SELF_ONLY",
+    "schedule": [
+      "08:00",
+      "12:00",
+      "16:00",
+      "20:00"
+    ]
+  }
+}
