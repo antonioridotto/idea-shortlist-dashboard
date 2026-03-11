@@ -16,9 +16,10 @@
  * The daily cron runs in the morning, checking posts from the last 3 days, which
  * avoids this timing issue entirely.
  * 
- * Usage: node check-analytics.js --config <config.json> [--days 3] [--connect] [--app snugly]
+ * Usage: node check-analytics.js --config <config.json> [--days 3] [--connect] [--auto-match] [--app snugly]
  * 
  * --connect: Actually connect release IDs (without this flag, it's dry-run)
+ * --auto-match: Allow chronological auto-matching for unresolved posts (unsafe; off by default)
  * --app: Filter to a specific app/integration name
  * --days: How many days back to check (default: 3)
  */
@@ -35,6 +36,7 @@ function getArg(name) {
 const configPath = getArg('config');
 const days = parseInt(getArg('days') || '3');
 const shouldConnect = args.includes('--connect');
+const autoMatch = args.includes('--auto-match');
 const appFilter = getArg('app');
 
 if (!configPath) {
@@ -48,6 +50,7 @@ const API_KEY = config.postiz.apiKey;
 const baseDir = path.dirname(configPath);
 const postIndexPath = path.join(baseDir, 'post-index.jsonl');
 const releaseMapPath = path.join(baseDir, 'release-map.json');
+const manualReleaseMapPath = path.join(baseDir, 'manual-release-map.json');
 
 function loadIndexedPostIds() {
   if (!fs.existsSync(postIndexPath)) return null;
@@ -65,6 +68,11 @@ function loadReleaseMap() {
 
 function saveReleaseMap(map) {
   fs.writeFileSync(releaseMapPath, JSON.stringify(map, null, 2));
+}
+
+function loadManualReleaseMap() {
+  if (!fs.existsSync(manualReleaseMapPath)) return {};
+  try { return JSON.parse(fs.readFileSync(manualReleaseMapPath, 'utf-8')); } catch { return {}; }
 }
 
 async function api(method, endpoint, body = null) {
@@ -126,67 +134,88 @@ async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
   }
   console.log('');
 
-  // 3. If there are connectable unconnected posts, get the TikTok video list
+  // 3. Connect missing release IDs
   if (connectableUnconnected.length > 0 && shouldConnect) {
     const releaseMap = loadReleaseMap();
+    const manualReleaseMap = loadManualReleaseMap();
 
-    // Use a healthy published unconnected post to get the missing list
-    // (ERROR-state posts often return empty missing lists)
-    const referencePost = connectableUnconnected.find(p => p.state === 'PUBLISHED') || connectableUnconnected[0];
-    console.log(`🔍 Fetching TikTok video list via post ${referencePost.id}...`);
-    const tiktokVideos = await api('GET', `/posts/${referencePost.id}/missing`);
+    // 3a) Apply explicit manual mappings first (safe path)
+    const manuallyResolved = [];
+    for (const post of connectableUnconnected) {
+      const videoId = manualReleaseMap[post.id];
+      if (!videoId) continue;
 
-    if (Array.isArray(tiktokVideos) && tiktokVideos.length > 0) {
-      // TikTok IDs are sequential (higher = newer). Sort ascending.
-      const videoIds = tiktokVideos.map(v => v.id).sort();
+      console.log(`  🔒 Manual map: "${(post.content || '').substring(0, 50)}..."`);
+      console.log(`     Post: ${post.id}`);
+      console.log(`     TikTok: ${videoId}`);
 
-      // Exclude already connected and already mapped IDs
-      const connectedIds = new Set(connected.map(p => p.releaseId).filter(Boolean));
-      const mappedIds = new Set(Object.values(releaseMap));
-      const availableIds = videoIds.filter(id => !connectedIds.has(id) && !mappedIds.has(id));
-
-      console.log(`  Found ${videoIds.length} TikTok videos, ${availableIds.length} available for new mapping\n`);
-
-      // Keep unresolved posts ordered by publish time
-      const unresolved = connectableUnconnected
-        .filter(p => !releaseMap[p.id])
-        .sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
-
-      // Map oldest unresolved posts to oldest available IDs (chronological)
-      const sortedAvailable = availableIds.sort();
-      const idsToUse = sortedAvailable.slice(0, unresolved.length);
-
-      for (let i = 0; i < unresolved.length; i++) {
-        const post = unresolved[i];
-        const videoId = idsToUse[i];
-        
-        if (!videoId) {
-          console.log(`  ⚠️ No matching video ID for "${(post.content || '').substring(0, 50)}..."`);
-          continue;
-        }
-
-        console.log(`  🔗 Connecting: "${(post.content || '').substring(0, 50)}..."`);
-        console.log(`     Post: ${post.id} (${post.publishDate})`);
-        console.log(`     TikTok: ${videoId}`);
-
-        const result = await api('PUT', `/posts/${post.id}/release-id`, { releaseId: videoId });
-        if (result.releaseId === videoId) {
-          console.log(`     ✅ Connected`);
-          releaseMap[post.id] = videoId;
-        } else {
-          console.log(`     ⚠️ Connection returned: ${JSON.stringify(result.releaseId)}`);
-        }
-        await sleep(1000);
+      const result = await api('PUT', `/posts/${post.id}/release-id`, { releaseId: videoId });
+      if (result.releaseId === videoId) {
+        console.log(`     ✅ Connected (manual)`);
+        releaseMap[post.id] = videoId;
+        manuallyResolved.push(post.id);
+      } else {
+        console.log(`     ⚠️ Manual connection returned: ${JSON.stringify(result.releaseId)}`);
       }
-
-      saveReleaseMap(releaseMap);
-      console.log(`  🧾 Saved mapping to ${releaseMapPath}`);
-      console.log('');
-    } else {
-      console.log(`  ⚠️ No TikTok videos found in missing list. Videos may need more time to index.\n`);
+      await sleep(1000);
     }
+
+    // 3b) Optional auto-match (chronological). Disabled by default.
+    const unresolved = connectableUnconnected
+      .filter(p => !releaseMap[p.id] && !manualReleaseMap[p.id])
+      .sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
+
+    if (unresolved.length > 0 && autoMatch) {
+      // Use a healthy published unconnected post to get the missing list
+      // (ERROR-state posts often return empty missing lists)
+      const referencePost = unresolved.find(p => p.state === 'PUBLISHED') || unresolved[0];
+      console.log(`🔍 Fetching TikTok video list via post ${referencePost.id}...`);
+      const tiktokVideos = await api('GET', `/posts/${referencePost.id}/missing`);
+
+      if (Array.isArray(tiktokVideos) && tiktokVideos.length > 0) {
+        const videoIds = tiktokVideos.map(v => v.id).sort();
+        const connectedIds = new Set(connected.map(p => p.releaseId).filter(Boolean));
+        const mappedIds = new Set(Object.values(releaseMap));
+        const availableIds = videoIds.filter(id => !connectedIds.has(id) && !mappedIds.has(id));
+
+        console.log(`  Found ${videoIds.length} TikTok videos, ${availableIds.length} available for auto-match\n`);
+
+        const idsToUse = availableIds.sort().slice(0, unresolved.length);
+        for (let i = 0; i < unresolved.length; i++) {
+          const post = unresolved[i];
+          const videoId = idsToUse[i];
+          if (!videoId) {
+            console.log(`  ⚠️ No video ID available for auto-match: "${(post.content || '').substring(0, 50)}..."`);
+            continue;
+          }
+
+          console.log(`  🤖 Auto-match: "${(post.content || '').substring(0, 50)}..."`);
+          console.log(`     Post: ${post.id} (${post.publishDate})`);
+          console.log(`     TikTok: ${videoId}`);
+
+          const result = await api('PUT', `/posts/${post.id}/release-id`, { releaseId: videoId });
+          if (result.releaseId === videoId) {
+            console.log(`     ✅ Connected (auto)`);
+            releaseMap[post.id] = videoId;
+          } else {
+            console.log(`     ⚠️ Auto-match returned: ${JSON.stringify(result.releaseId)}`);
+          }
+          await sleep(1000);
+        }
+      } else {
+        console.log(`  ⚠️ No TikTok videos found in missing list. Videos may need more time to index.\n`);
+      }
+    } else if (unresolved.length > 0 && !autoMatch) {
+      console.log(`  ⚠️ ${unresolved.length} unresolved posts left. Chronological auto-match is OFF.`);
+      console.log(`     Add exact mappings in: ${manualReleaseMapPath}`);
+      console.log(`     Format: { "<postId>": "<tiktokVideoId>" }\n`);
+    }
+
+    saveReleaseMap(releaseMap);
+    console.log(`  🧾 Saved mapping cache to ${releaseMapPath}`);
+    console.log('');
   } else if (connectableUnconnected.length > 0 && !shouldConnect) {
-    console.log(`  ℹ️ ${connectableUnconnected.length} posts need connecting. Run with --connect to auto-connect.\n`);
+    console.log(`  ℹ️ ${connectableUnconnected.length} posts need connecting. Run with --connect (manual map first).\n`);
   }
 
   // 4. Pull analytics for all connected posts
