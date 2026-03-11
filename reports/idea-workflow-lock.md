@@ -17,8 +17,8 @@
 ## Never do
 - Never send raw first-30 as final pool.
 - Never pick top-3 outside the clean pool.
-- Never output "0 ideas" or "insufficient" to Ibrahim.
-- If pool collapses, treat it as pipeline failure and re-run: increase page depth, execute 30->60->90 window expansion, then US->WW fallback, and still return a valid clean list + staged narrowing.
+- Never fabricate/guess a 30-list from stale files/history when live source rows are unavailable.
+- If live source rows are unavailable after 30->60->90 and page depth 10..20, return `SOURCE_UNAVAILABLE` (hard fail) and stop. Do not auto-build.
 
 
 ## Ranking policy update (from Ibrahim feedback)

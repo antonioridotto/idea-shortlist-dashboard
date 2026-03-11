@@ -2,9 +2,8 @@
 
 ## Latest
 
-- Date: 2026-03-11 (TEST re-run @ 10:36)
-- Status: INSUFFICIENT_CANDIDATES
-- Rule set enforced: release window 30->60->90, exact revenue only, content-heavy exclusion, exclude list, history dedupe
-- Scan: locked Apptica pages 1..10 per window (US-first), raw rows not retrievable in this run context
-- Auto-build: DISABLED (test mode)
-- Result: No valid top-3 can be produced without breaking rules.
+- Date: 2026-03-11T10:45:08+01:00
+- Status: SOURCE_UNAVAILABLE
+- Guard: active (no stale fallback, no fake 30 list)
+- Auto-build: DISABLED
+- Result: shortlist blocked until live rows are retrievable.
