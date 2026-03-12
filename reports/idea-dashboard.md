@@ -2,8 +2,7 @@
 
 ## Latest
 
-- Date: 2026-03-11T10:45:08+01:00
+- Date: 2026-03-12T04:02:30+01:00
 - Status: SOURCE_UNAVAILABLE
-- Guard: active (no stale fallback, no fake 30 list)
-- Auto-build: DISABLED
-- Result: shortlist blocked until live rows are retrievable.
+- Scan: US+WW, windows 30/60/90, pages 1-20 (120 attempts)
+- Result: No retrievable rows; shortlist generation blocked.
